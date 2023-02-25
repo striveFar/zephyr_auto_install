@@ -87,8 +87,8 @@ source_venv() {
     return $?
 }
 
-sudo apt update
-sudo apt upgrade
+sudo apt update -y
+sudo apt upgrade -y
 
 sudo apt install -y --no-install-recommends git cmake ninja-build gperf \
 	ccache dfu-util device-tree-compiler wget \
