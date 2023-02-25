@@ -29,7 +29,7 @@ ubuntu_version=$(lsb_release -rs)
 # 判断当前版本号是否大于等于20.04
 if [ "$(printf '%s\n' "$ubuntu_version" "20.04" | sort -V | head -n 1)" = "20.04" ]; then
 	echo "Welcome to use the Zephyr environment deployment script!"
-	if [ "$(printf '%s\n' "$ubuntu_version" "22.04" | sort -V | tail -n 1)" = "22.04" ]; then
+	if [ "$(printf '%s\n' "$ubuntu_version" "20.04" | sort -V | tail -n 1)" != "22.04" ]; then
 		echo "Auto download Kitware: The current Ubuntu version is $ubuntu_version"
 		# Check if kitware-archive.sh exists
 		if [ ! -f "kitware-archive.sh" ]; then
