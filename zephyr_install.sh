@@ -23,6 +23,28 @@ ask_yn()
   done
 }
 
+# 获取当前Ubuntu操作系统版本号
+ubuntu_version=$(lsb_release -rs)
+
+# 判断当前版本号是否大于等于20.04
+if [ "$(printf '%s\n' "$ubuntu_version" "20.04" | sort -V | head -n 1)" = "20.04" ]; then
+	echo "Welcome to use the Zephyr environment deployment script!"
+	if [ "$(printf '%s\n' "$ubuntu_version" "22.04" | sort -V | tail -n 1)" = "22.04" ]; then
+		echo "Auto download Kitware: The current Ubuntu version is $ubuntu_version"
+		# Check if kitware-archive.sh exists
+		if [ ! -f "kitware-archive.sh" ]; then
+			# Download and run kitware-archive.sh
+			echo "The current Ubuntu version is $ubuntu_version"
+			echo "您的 Ubuntu 版本较旧，将为您下载并安装 Kitware 存储库。"
+			wget https://apt.kitware.com/kitware-archive.sh
+			sudo bash kitware-archive.sh
+		fi
+
+	fi
+else
+	echo "The current Ubuntu version is $ubuntu_version, which is too low for Zephyr environment deployment."
+fi
+
 
 # 检查参数数量是否正确            
 if [ $# -ne 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -65,20 +87,6 @@ source_venv() {
     return $?
 }
 
-# 检查 Ubuntu 版本
-if [[ $(lsb_release -rs) < "22.04" ]]; then
-	# Check if kitware-archive.sh exists
-	if [ ! -f "kitware-archive.sh" ]; then
-		# Download and run kitware-archive.sh
-		echo "您的 Ubuntu 版本较旧，将为您下载并安装 Kitware 存储库。"
-		wget https://apt.kitware.com/kitware-archive.sh
-		sudo bash kitware-archive.sh
-	fi
-else
-	# 打印提示信息
-	echo "您的 Ubuntu 版本已经足够新，不需要安装 Kitware 存储库。"
-fi
-
 sudo apt update
 sudo apt upgrade
 
@@ -92,21 +100,27 @@ python_version=$(python3 --version | grep -oE "[0-9]+\.[0-9]+")
 dtc_version=$(dtc --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
 
 
-if [[ $(echo -e "$cmake_version\n3.20.0" | sort -V | head -n1) < $CMAKE_MIN_VERSION ]]; then
-    echo -e "${RED}Please update CMake version to at least 3.20.0${NC}"
-    exit 1
+if [[ $(echo -e "$cmake_version\n3.20.0" | sort -V | head -n1) = $CMAKE_MIN_VERSION ]]; then
+	echo -e "${GREEN}The current cmake version is $cmake_version ${NC}"
+else
+	echo -e "${RED}Please update CMake version to at least 3.20.0${NC}"
+	exit 1
 fi
 
-if [[ $(echo -e "$python_version\n3.8" | sort -V | head -n1) < $PYTHON_MIN_VERSION ]]; then
-    echo -e "${RED}Please update Python version to at least 3.8${NC}"
-    exit 1
+if [[ $(echo -e "$python_version\n3.8" | sort -V | head -n1) = $PYTHON_MIN_VERSION ]]; then
+	echo -e "${GREEN}The current python version is $python_version ${NC}"
+else
+	echo -e "${RED}Please update Python version to at least 3.8 ${NC}"
+	exit 1
 fi
 
-if [[ $(echo -e "$dtc_version\n1.4.6" | sort -V | head -n1) < $DTC_MIN_VERSION ]]; then
-    echo -e "${RED}Please update DTC version to at least 1.4.6${NC}"
-    exit 1
+if [[ $(echo -e "$dtc_version\n1.4.6" | sort -V | head -n1) = $DTC_MIN_VERSION ]]; then
+	echo -e "${GREEN}The current dtc version is $dtc_version ${NC}"
+else
+	echo -e "${RED}Please update DTC version to at least 1.4.6 ${NC}"
+	exit 1
 fi
-    echo -e "${GREEN}All versions OK${NC}"
+echo -e "${GREEN}All versions OK${NC}"
 
 
 
@@ -132,7 +146,14 @@ west init $zephyr_project_path
 cd $zephyr_project_path
 west update
 west zephyr-export
-pip install -r $zephyr_project_path/zephyr/scripts/requirements.txt
+pip install -r ./zephyr/scripts/requirements.txt
+# DEPRECATION是一个术语，用于指示某个软件包、工具或代码库中的某个功能、方法、
+# 类或模块即将过时，可能会在未来的版本中被删除，而应该采用替代功能或方法。
+# 在给出的示例中，DEPRECATION警告告诉用户正在使用的软件包中的一些组件是旧的，
+# 未来版本可能会删除它们，并提供了一些替代选项。
+# 警告中还提供了有关如何替换功能的指南和文档链接，
+# 以便用户可以了解如何更新他们的代码。
+pip install -r ./zephyr/scripts/requirements.txt
 cd -
 
 
