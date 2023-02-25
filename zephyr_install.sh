@@ -194,7 +194,8 @@ else
 fi
 
 cd ${zephyr_sdk_dir}
-./setup.sh
+# 不断输出字母 "y"，直到脚本退出
+yes y | ./setup.sh
 cd -
 
 echo -e "${GREEN}如需编译，请激活 Python 虚拟环境, 执行：source $zephyr_project_path/.venv/bin/activate${NC}"
