@@ -142,20 +142,12 @@ fi
 echo "West is installed successfully."
 
 
-west init $zephyr_project_path
+west init -m https://github.com/zephyrproject-rtos/example-application --mr main $zephyr_project_path
 cd $zephyr_project_path
 west update
 west zephyr-export
 pip install -r ./zephyr/scripts/requirements.txt
-# DEPRECATION是一个术语，用于指示某个软件包、工具或代码库中的某个功能、方法、
-# 类或模块即将过时，可能会在未来的版本中被删除，而应该采用替代功能或方法。
-# 在给出的示例中，DEPRECATION警告告诉用户正在使用的软件包中的一些组件是旧的，
-# 未来版本可能会删除它们，并提供了一些替代选项。
-# 警告中还提供了有关如何替换功能的指南和文档链接，
-# 以便用户可以了解如何更新他们的代码。
-pip install -r ./zephyr/scripts/requirements.txt
 cd -
-
 
 
 # get latest sdk version
